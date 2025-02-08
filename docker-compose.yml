@@ -1,0 +1,61 @@
+services:
+  phpmyadmin:
+    container_name: track_courier_phpmyadmin
+    image: phpmyadmin
+    ports:
+      - "15000:80"
+    volumes:
+      - ./docker/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro
+    environment:
+      environment: ${APP_ENV}
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+      UPLOAD_LIMIT: "32M"
+  server:
+    container_name: track_courier_server
+    build:
+      context: ./docker/server
+    ports:
+      - "80:8000" # for http
+    volumes:
+      - .:/var/www/html
+    environment:
+      DEBIAN_FRONTEND: "noninteractive"
+  mysql:
+    container_name: track_courier_mysql
+    image: mysql:latest
+    expose:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql/remote_access.sql:/docker-entrypoint-initdb.d/remote_access.sql
+      - ./docker/mysql/custom.cnf:/etc/mysql/conf.d/custom.cnf
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+  cron:
+    container_name: track_courier_cron
+    build:
+      context: ./docker/cron
+    volumes:
+      - ./docker/cron/crontab:/etc/cron.d/crontab
+      - .:/var/www/html
+    working_dir: /var/www/html
+  redis:
+    image: redis:alpine
+    container_name: track_courier_redis
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}"
+    volumes:
+        - ./data/redis:/data
+    ports:
+      - "8002:6379"
+  vite:
+    container_name: track_courier_vite
+    build:
+      context: ./docker/vite
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/var/www/html
+    environment:
+      DEBIAN_FRONTEND: "noninteractive"
+    working_dir: /var/www/html

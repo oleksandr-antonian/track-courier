@@ -1,0 +1,9 @@
+SHELL=/bin/bash
+BASH_ENV=/container.env
+* * * * * /usr/bin/env > /root/cron_env
+
+# ------------- DO NOT REMOVE THE ABOVE LINES -----------------------
+
+# ------------- ADD YOUR CUSTOM CRON COMMANDS BELOW ----------------:
+
+* * * * * php /var/www/html/artisan schedule:run >> /dev/null 2>&1
