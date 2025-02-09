@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Http\Resources\Api\AuthResource;
+use App\Http\Resources\AuthResource;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 

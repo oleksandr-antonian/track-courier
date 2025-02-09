@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CityController;
+use App\Http\Controllers\Api\CountryController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -10,5 +12,14 @@ Route::prefix('auth')->group(function () {
         Route::get('user', [AuthController::class, 'user']);
         Route::post('logout', [AuthController::class, 'logout']);
     });
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('cities', CityController::class)->only([
+        'index', 'show'
+    ]);
+    Route::apiResource('countries', CountryController::class)->only([
+        'index', 'show'
+    ]);
 });
 

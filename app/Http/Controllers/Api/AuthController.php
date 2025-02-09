@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\LoginRequest;
-use App\Http\Resources\Api\ResponseApiResource;
-use App\Http\Resources\Api\UserResource;
+use App\Http\Resources\ResponseApiResource;
+use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
@@ -19,10 +19,6 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
-    /**
-     * @param LoginRequest $request
-     * @return ResponseApiResource
-     */
     public function login(LoginRequest $request): ResponseApiResource
     {
         try {
@@ -38,10 +34,6 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * @param Request $request
-     * @return ResponseApiResource
-     */
     public function logout(Request $request): ResponseApiResource
     {
         try {
@@ -53,10 +45,6 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * @param Request $request
-     * @return ResponseApiResource
-     */
     public function user(Request $request): ResponseApiResource
     {
         return new ResponseApiResource(new UserResource($request->user()), 'User data');
