@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Api;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ResponseApiResource extends JsonResource
@@ -15,7 +14,7 @@ class ResponseApiResource extends JsonResource
         $this->statusCode = $statusCode;
     }
 
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             'status' => $this->resource ? 'success' : 'error',
@@ -25,7 +24,7 @@ class ResponseApiResource extends JsonResource
         ];
     }
 
-    public function withResponse($request, $response)
+    public function withResponse($request, $response): void
     {
         $response->setStatusCode($this->statusCode);
     }

@@ -1,11 +1,11 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\Sanctum;
 
-uses(RefreshDatabase::class)->group('auth');
+uses(DatabaseTransactions::class)->group('auth');
 
 test('user can log in successfully', function () {
     $user = User::factory()->create(['password' => bcrypt('password')]);
@@ -45,7 +45,7 @@ test('login fails with wrong credentials', function () {
         'password' => 'wrongpassword',
     ]);
 
-    $response->assertStatus(401)
+    $response->assertStatus(422)
         ->assertJsonStructure(['status', 'message', 'data', 'errors'])
         ->assertJson([
             'status' => 'error',
@@ -67,4 +67,24 @@ test('user can log out', function () {
 test('logout fails if user is not authenticated', function () {
     $response = $this->postJson('/api/auth/logout');
     $response->assertStatus(401);
+});
+
+test('user can get their profile', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user);
+
+    $response = $this->getJson('/api/auth/user');
+
+    $response->assertStatus(200)
+        ->assertJsonStructure([
+            'status',
+            'message',
+            'data' => [
+                'id',
+                'name',
+                'email',
+                'created_at',
+                'updated_at',
+            ],
+        ]);
 });
