@@ -1,10 +1,11 @@
 <script setup>
-import Toast from 'primevue/toast';
+import {Toast, ConfirmPopup} from 'primevue';
 </script>
 
 <template>
     <RouterView />
     <Toast />
+    <ConfirmPopup />
 </template>
 
 <style scoped>

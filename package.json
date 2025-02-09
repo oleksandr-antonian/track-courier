@@ -27,6 +27,7 @@
         "primevue": "^4.2.5",
         "pusher-js": "^8.4.0",
         "tailwindcss-primeui": "^0.4.0",
-        "vue-router": "^4.5.0"
+        "vue-router": "^4.5.0",
+        "vue3-google-map": "^0.21.1"
     }
 }

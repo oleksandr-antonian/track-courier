@@ -21,6 +21,12 @@ const routes = [
         meta: { middleware: ['auth'] }
     },
     {
+        path: '/couriers/:id',
+        name: 'courier',
+        component: () => import('@/views/CourierDetailView.vue'),
+        meta: { middleware: ['auth'] }
+    },
+    {
         path: '/debug',
         name: 'debug',
         component: () => import('@/views/DebugView.vue'),

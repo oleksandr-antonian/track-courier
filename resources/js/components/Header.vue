@@ -62,7 +62,7 @@ const closeProfileMenu = () => {
 <template>
   <div>
     <Menubar :model="items">
-      <template #item="{ item, props, hasSubmenu, root }">
+      <template #item="{ item }">
         <router-link :to="{name: item.routerName}" class="flex items-center gap-2 py-2 px-4 rounded" :class="{'bg-primary-500 text-white': currentRouteName === item.routerName}">
           <i :class="item.icon"></i>
           <span>{{ item.label }}</span>
@@ -75,7 +75,7 @@ const closeProfileMenu = () => {
             <span>{{ user.name }}</span>
           </div>
           <transition name="fade">
-            <div class="absolute top-full left-0 right-0 mt-1" v-on-click-outside="closeProfileMenu" v-if="isOpenProfileMenu">
+            <div class="absolute top-full left-0 right-0 mt-1 z-10" v-on-click-outside="closeProfileMenu" v-if="isOpenProfileMenu">
               <Menu :model="profileMenuItems" />
             </div>
           </transition>
