@@ -9,5 +9,11 @@ class CourierLocation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['courier_id', 'latitude', 'longitude'];
+    public $timestamps = false;
+
+    protected $fillable = ['courier_id', 'latitude', 'longitude', 'created_at'];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('courier_id')->constrained()->onDelete('cascade');
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
-            $table->timestamps();
+            $table->timestamp('created_at');
         });
     }
 
