@@ -2,15 +2,13 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CourierLocationUpdated
+class CourierLocationUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -20,9 +18,9 @@ class CourierLocationUpdated
         public float $longitude
     ) {}
 
-    public function broadcastOn(): PresenceChannel
+    public function broadcastOn(): PrivateChannel
     {
-        return new PresenceChannel('couriers.global');
+        return new PrivateChannel('couriers.locations');
     }
 
     public function broadcastWith(): array

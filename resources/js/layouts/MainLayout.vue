@@ -1,6 +1,6 @@
 <script setup>
 import Header from '@/components/Header.vue';
-import { ref, defineProps, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const header = ref(null);
 const headerHeight = ref(0);

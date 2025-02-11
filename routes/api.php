@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\CourierController;
+use App\Http\Controllers\Api\CourierLocationController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -26,5 +27,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/couriers/transport-types', [CourierController::class, 'getTransportTypes']);
     Route::get('/couriers/availability-statuses', [CourierController::class, 'getAvailabilityStatuses']);
     Route::apiResource('couriers', CourierController::class);
+
+    Route::get('/couriers/{courier}/location', [CourierLocationController::class, 'show']);
+    Route::post('/couriers/{courier}/locations', [CourierLocationController::class, 'store']);
 });
 

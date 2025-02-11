@@ -1,29 +1,30 @@
-import ApiService from './ApiService';
+import ApiService from "./ApiService";
 
-export default {
-    login(email, password) {
-       try {
-           const credentials = {
-               email: email,
-               password: password,
-           };
-           return ApiService.post('/auth/login', credentials);
-       } catch (error) {
-           throw error;
-       }
-    },
-    logout() {
+class AuthService {
+    async login(email, password) {
         try {
-            return ApiService.post('/auth/logout');
-        } catch (error) {
-            throw error;
-        }
-    },
-    getUser() {
-        try {
-            return ApiService.get('/auth/user');
+            const credentials = { email, password };
+            return await ApiService.post("/auth/login", credentials);
         } catch (error) {
             throw error;
         }
     }
-};
+
+    async logout() {
+        try {
+            return await ApiService.post("/auth/logout");
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getUser() {
+        try {
+            return await ApiService.get("/auth/user");
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+
+export default new AuthService();

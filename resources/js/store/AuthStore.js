@@ -46,7 +46,8 @@ const useAuthStore = defineStore('auth', {
                     this.isAuthenticated = true;
                 } catch (error) {
                     console.error('Failed to fetch user', error);
-                    await this.logout();
+                    this.setUser(null);
+                    this.setToken(null);
                 }
             }
         },

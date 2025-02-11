@@ -16,9 +16,9 @@ class CourierFactory extends Factory
             'last_name' => $this->faker->lastName(),
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->e164PhoneNumber(),
-            'availability_status' => $this->faker->randomElement(CourierAvailabilityStatus::getValues()),
+            'availability_status' => CourierAvailabilityStatus::Offline,
             'transport_type' => $this->faker->randomElement(CourierTransportType::getValues()),
-            'city_id' => City::inRandomOrder()->first()?->id ?? City::factory(),
+            'city_id' => City::first()?->id ?? City::factory(),
         ];
     }
 }

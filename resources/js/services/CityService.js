@@ -1,6 +1,6 @@
 import ApiService from "./ApiService";
 
-export default {
+class CityService {
     async getCities() {
         try {
             return await ApiService.get("/cities");
@@ -8,4 +8,6 @@ export default {
             throw error;
         }
     }
-};
+}
+
+export default new CityService();

@@ -2,73 +2,60 @@
 
 namespace App\Services;
 
-use App\Events\CourierLocationUpdated;
-use App\Models\CourierLocation;
-use Illuminate\Support\Facades\Redis;
-use Carbon\Carbon;
+use App\Repositories\CourierLocationRedisRepository;
+use App\Repositories\CourierLocationRepository;
+use App\Repositories\CourierRepository;
 
 class CourierLocationService
 {
-    private const REDIS_KEY_PREFIX = 'courier:location:';
+    private CourierLocationRedisRepository $redisRepository;
+    private CourierLocationRepository $databaseRepository;
+    private CourierRepository $courierRepository;
 
-    public function updateLocation(int $courierId, float $latitude, float $longitude): void
+    public function __construct(
+        CourierLocationRedisRepository $redisRepository,
+        CourierLocationRepository $databaseRepository,
+        CourierRepository $courierRepository
+    ) {
+        $this->redisRepository = $redisRepository;
+        $this->databaseRepository = $databaseRepository;
+        $this->courierRepository = $courierRepository;
+    }
+
+    public function show(int $courierId): array
     {
-        $timestamp = Carbon::now()->timestamp;
-        $redisKey = self::REDIS_KEY_PREFIX . $courierId;
+        $location = $this->redisRepository->getLatestLocation($courierId);
+        if (!$location) {
+            $location = $this->databaseRepository->getLatestLocation($courierId);
+        }
+        return $location;
+    }
 
-        Redis::rpush($redisKey, json_encode([
-            'lat' => $latitude,
-            'lng' => $longitude,
-            'timestamp' => $timestamp,
-        ]));
-
-        broadcast(new CourierLocationUpdated($courierId, $latitude, $longitude));
+    public function store(int $courierId, float $latitude, float $longitude): void
+    {
+        $this->redisRepository->updateLocation($courierId, $latitude, $longitude);
     }
 
     public function syncLocations(): void
     {
-        $courierKeys = Redis::keys(self::REDIS_KEY_PREFIX . '*');
-
-        foreach ($courierKeys as $courierKey) {
-            $courierId = explode(':', $courierKey)[2];
-            $redisKey = self::REDIS_KEY_PREFIX . $courierId;
-            $courierLocations = Redis::lrange($redisKey, 0, -1);
-            $this->saveLocations($courierId, $courierLocations);
-            $this->cleanupRedis($courierId, $courierLocations);
+        $courierIds = $this->redisRepository->getCourierIds();
+        foreach ($courierIds as $courierId) {
+            $locations = $this->redisRepository->getLocations($courierId);
+            $this->databaseRepository->syncLocationsFromRedis($courierId, $locations);
+            $this->redisRepository->cleanupLocation($courierId);
         }
     }
 
-    private function saveLocations(int $courierId, array $locations): void
+    public function getOnlineCouriersLocations(): array
     {
-        $lastSavedLocation = null;
-
-        foreach ($locations as $location) {
-            $location = json_decode($location, true);
-            $timestamp = Carbon::createFromTimestamp($location['timestamp']);
-
-            if (!$lastSavedLocation || $lastSavedLocation['timestamp']->diffInMinutes($timestamp) > 4) {
-                CourierLocation::create([
-                    'courier_id' => $courierId,
-                    'latitude' => $location['lat'],
-                    'longitude' => $location['lng'],
-                    'created_at' => $timestamp->toDateTimeString(),
-                ]);
-            }
-
-            $lastSavedLocation = ['timestamp' => $timestamp];
-        }
-    }
-
-    private function cleanupRedis(int $courierId, array $locations): void
-    {
-        $lastLocation = json_decode(end($locations), true);
-        $timestamp = Carbon::createFromTimestamp($lastLocation['timestamp']);
-        $redisKey = self::REDIS_KEY_PREFIX . $courierId;
-
-        if (Carbon::now()->diffInHours($timestamp) > 1) {
-            Redis::del($redisKey);
-        } else {
-            Redis::ltrim($redisKey, -1, -1);
-        }
+        $onlineCouriers = $this->courierRepository->getOnlineCouriers();
+        $courierIds = $onlineCouriers->pluck('id')->toArray();
+        $locations = $this->redisRepository->getLatestLocationsForCouriers($courierIds);
+        $locations = $locations->map(function ($location) use ($onlineCouriers) {
+            $courier = $onlineCouriers->firstWhere('id', $location['courier_id']);
+            $location['courier_name'] = $courier->name;
+            return $location;
+        });
+        return $locations->toArray();
     }
 }
