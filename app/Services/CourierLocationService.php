@@ -22,7 +22,7 @@ class CourierLocationService
         $this->courierRepository = $courierRepository;
     }
 
-    public function show(int $courierId): array
+    public function show(int $courierId): ?array
     {
         $location = $this->redisRepository->getLatestLocation($courierId);
         if (!$location) {

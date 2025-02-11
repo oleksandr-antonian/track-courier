@@ -28,7 +28,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/couriers/availability-statuses', [CourierController::class, 'getAvailabilityStatuses']);
     Route::apiResource('couriers', CourierController::class);
 
-    Route::get('/couriers/{courier}/location', [CourierLocationController::class, 'show']);
     Route::post('/couriers/{courier}/locations', [CourierLocationController::class, 'store']);
 });
 
